@@ -39,12 +39,11 @@ public class Customer {
     @Column(name = "city", nullable = false)
     private String city;
 
-    @Column(name = "state")
+//    @Column(name = "state")
+//    private String state;
 
-    private String state;
-
-    @Column(name = "postalCode")
-    private String postalCode;
+//    @Column(name = "postalCode")
+//    private String postalCode;
 
     @Column(name = "country", nullable = false)
     private String country;
@@ -56,5 +55,4 @@ public class Customer {
 //    @ManyToOne(fetch = FetchType.LAZY)
 //    @JoinColumn(name = "salesRepEmployeeNumber")
 //    private Employee salesRepEmployee;
-
 }
