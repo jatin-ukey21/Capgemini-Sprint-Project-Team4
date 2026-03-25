@@ -1,4 +1,4 @@
-package com.example.DemoCheck.api;
+package com.example.DemoCheck.Api;
 
 public class CustomerControllerTest {
 }
