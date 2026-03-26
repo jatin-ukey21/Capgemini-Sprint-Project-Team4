@@ -66,4 +66,61 @@ class OfficeRepositoryTest {
         assertNotNull(offices);
         assertTrue(offices.isEmpty());
     }
+
+    //add
+    @Test
+    void save_shouldInsertOffice_whenOfficeCodeIsNew(){
+        Office office = createOffice("R91", "Nagpur", "9999999999",
+                "Main Road", "Near Square", "MH", "India", "440001", "APAC");
+
+        Office saved = officeRepository.save(office);
+
+        assertNotNull(saved);
+        assertEquals("R91",saved.getOfficeCode());
+    }
+
+    //update
+    @Test
+    void save_shouldUpdatePhone_whenOfficeExists(){
+        officeRepository.save(
+                createOffice("R93", "London", "2222222222", "B1", "B2", "S2", "UK", "EC1A", "EMEA")
+        );
+
+        Office office = officeRepository.findById("R93").orElseThrow();
+        office.setPhone("7777777777");
+        officeRepository.saveAndFlush(office);
+
+        Office updated = officeRepository.findById("R93").orElseThrow();
+        assertEquals("7777777777",updated.getPhone());
+    }
+
+    //full update
+    @Test
+    void save_shouldUpdateOffice_whenOfficeExists(){
+        officeRepository.save(
+                createOffice("R94", "Tokyo", "3333333333", "C1", "C2", "S3", "Japan", "100001", "APAC")
+        );
+
+        Office office = officeRepository.findById("R94").orElseThrow();
+        office.setCity("Tokyo Updated");
+        office.setPhone("6666666666");
+        office.setAddressLine1("Updated Line 1");
+
+        officeRepository.saveAndFlush(office);
+
+        Office updated = officeRepository.findById("R94").orElseThrow();
+        assertEquals("Tokyo Updated",updated.getCity());
+        assertEquals("6666666666",updated.getPhone());
+        assertEquals("Updated Line 1",updated.getAddressLine1());
+    }
+
+    @Test
+    void save_shouldCreateOffice_whenOfficeDoesNotExist(){
+        Office office = createOffice("R95", "Brand New City", "5555555555",
+                "New 1", "New 2", "MH", "India", "440003", "APAC");
+
+        officeRepository.saveAndFlush(office);
+
+        assertTrue(officeRepository.existsById("R95"));
+    }
 }
