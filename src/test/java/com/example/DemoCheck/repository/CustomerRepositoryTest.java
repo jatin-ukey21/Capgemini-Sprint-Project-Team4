@@ -17,7 +17,7 @@ class CustomerRepositoryTest {
     @Autowired
     private CustomerRepository customerRepository;
 
-    //Helper method (VERY CLEAN PRACTICE)
+    //Helper method
     private Customer createCustomer(int id, String name, String city) {
         Customer c = new Customer();
         c.setCustomerNumber(id);
@@ -60,7 +60,7 @@ class CustomerRepositoryTest {
     }
 
     @Test
-    void testSearchByKeyword() {
+    void testFindCustomersByKeyword() {
 
         //arrange
         int baseId = customerRepository.findAll().size() + 2000;
@@ -71,7 +71,7 @@ class CustomerRepositoryTest {
         customerRepository.saveAll(List.of(c1, c2));
 
         //act
-        var result = customerRepository.search("Tech", org.springframework.data.domain.PageRequest.of(0, 10));
+        var result = customerRepository.findCustomers("Tech", org.springframework.data.domain.PageRequest.of(0, 10));
 
         //assert
         assertThat(result.getContent())
@@ -80,7 +80,7 @@ class CustomerRepositoryTest {
     }
 
     @Test
-    void testSearchCaseInsensitive() {
+    void testFindCustomersCaseInsensitive() {
 
         //arrange
         int baseId = customerRepository.findAll().size() + 3000;
@@ -89,7 +89,7 @@ class CustomerRepositoryTest {
         customerRepository.save(c1);
 
         //act
-        var result = customerRepository.search("tech", org.springframework.data.domain.PageRequest.of(0, 10));
+        var result = customerRepository.findCustomers("tech", org.springframework.data.domain.PageRequest.of(0, 10));
 
         //assert
         assertThat(result.getContent())
@@ -122,10 +122,10 @@ class CustomerRepositoryTest {
     }
 
     @Test
-    void testSearchReturnsEmptyWhenNoMatch() {
+    void testFindCustomersReturnsEmptyWhenNoMatch() {
 
         // Act
-        var result = customerRepository.search("NON_EXISTENT",
+        var result = customerRepository.findCustomers("NON_EXISTENT",
                 org.springframework.data.domain.PageRequest.of(0, 10));
 
         // Assert

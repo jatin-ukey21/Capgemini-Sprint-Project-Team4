@@ -101,7 +101,7 @@ class OfficeRestApiTest {
                 createOffice("T23", "Tokyo", "6666666666", "F1", "F2", "State6", "Japan", "100-0002", "APAC")
         ));
 
-        mockMvc.perform(get("/offices/search/by-cities")
+        mockMvc.perform(get("/offices/findCustomers/by-cities")
                         .param("cities", "Paris,London"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$._embedded.offices").exists());
@@ -114,7 +114,7 @@ class OfficeRestApiTest {
                 createOffice("T32", "London", "8888888888", "H1", "H2", "State8", "UK", "EC1C", "EMEA")
         ));
 
-        mockMvc.perform(get("/offices/search/by-cities")
+        mockMvc.perform(get("/offices/findCustomers/by-cities")
                         .param("cities", "Xcity,XY"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$._embedded.offices.length()").value(0));

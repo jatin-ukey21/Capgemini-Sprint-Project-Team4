@@ -42,6 +42,55 @@ class CustomerApiTest {
         c.setSalesRepEmployee(null);
         return c;
     }
+
+    @Test
+    void testGetCustomerById() throws Exception {
+
+        // Arrange
+        int baseId = (int)(System.currentTimeMillis() % 100000);
+
+        Customer c = createCustomer(baseId, "Single Customer", "Mumbai");
+        customerRepository.save(c);
+
+        var request = get("/customer/" + baseId);
+
+        // Act
+        var result = mockMvc.perform(request);
+
+        // Assert
+        result.andExpect(status().isOk())
+                .andExpect(jsonPath("$.customerName").value("Single Customer"));
+    }
+
+    @Test
+    void testGetCustomerByInvalidId() throws Exception {
+
+        // Arrange
+        int invalidId = 99999999;
+
+        var request = get("/customer/" + invalidId);
+
+        // Act
+        var result = mockMvc.perform(request);
+
+        // Assert
+        result.andExpect(status().isNotFound());;
+    }
+
+    @Test
+    void testGetCustomerWithInvalidIdFormat() throws Exception {
+
+        // Arrange
+        var request = get("/customer/abc");
+
+        // Act
+        var result = mockMvc.perform(request);
+
+        // Assert
+        result.andExpect(status().isBadRequest());
+    }
+
+
     @Test
     void testGetAllCustomers() throws Exception {
 
@@ -83,6 +132,22 @@ class CustomerApiTest {
     }
 
     @Test
+    void testPaginationOutOfBounds() throws Exception {
+
+        // Arrange
+        var request = get("/customer")
+                .param("page", "1000")
+                .param("size", "12");
+
+        // Act
+        var result = mockMvc.perform(request);
+
+        // Assert
+        result.andExpect(status().isOk())
+                .andExpect(jsonPath("$._embedded.customers").isEmpty());
+    }
+
+    @Test
     void testProjectionFields() throws Exception {
 
         // Arrange
@@ -107,6 +172,27 @@ class CustomerApiTest {
     }
 
     @Test
+    void testGetCustomerByIdWithProjection() throws Exception {
+
+        // Arrange
+        int baseId = (int)(System.currentTimeMillis() % 100000);
+
+        Customer c = createCustomer(baseId, "Projected Customer", "Delhi");
+        customerRepository.save(c);
+
+        var request = get("/customer/" + baseId)
+                .param("projection", "customerView");
+
+        // Act
+        var result = mockMvc.perform(request);
+
+        // Assert
+        result.andExpect(status().isOk())
+                .andExpect(jsonPath("$.contactName").exists())
+                .andExpect(jsonPath("$.address").exists());
+    }
+
+    @Test
     void testSearchApi() throws Exception {
 
         // Arrange
@@ -116,7 +202,7 @@ class CustomerApiTest {
 
         customerRepository.save(c1);
 
-        var request = get("/customer/search/search")
+        var request = get("/customer/search/findCustomers")
                 .param("keyword", "SearchTest")
                 .param("page", "0")
                 .param("size", "12");
@@ -134,7 +220,7 @@ class CustomerApiTest {
     void testSearchNoResults() throws Exception {
 
         // Arrange
-        var request = get("/customer/search/search")
+        var request = get("/customer/search/findCustomers")
                 .param("keyword", "XYZ_NOT_FOUND")
                 .param("page", "0")
                 .param("size", "12");
@@ -147,27 +233,13 @@ class CustomerApiTest {
                 .andExpect(jsonPath("$._embedded.customers").isEmpty());
     }
 
-    @Test
-    void testPaginationOutOfBounds() throws Exception {
 
-        // Arrange
-        var request = get("/customer")
-                .param("page", "1000")
-                .param("size", "12");
-
-        // Act
-        var result = mockMvc.perform(request);
-
-        // Assert
-        result.andExpect(status().isOk())
-                .andExpect(jsonPath("$._embedded.customers").isEmpty());
-    }
 
     @Test
     void testSearchWithEmptyKeyword() throws Exception {
 
         // Arrange
-        var request = get("/customer/search/search")
+        var request = get("/customer/search/findCustomers")
                 .param("keyword", "")
                 .param("page", "0")
                 .param("size", "12");

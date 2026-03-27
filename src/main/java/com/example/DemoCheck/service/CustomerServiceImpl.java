@@ -22,7 +22,7 @@
 //
 //        Page<Customer> result;
 //
-//        //Handle empty / null search → return all customers
+//        //Handle empty / null findCustomers → return all customers
 //        if (query == null || query.trim().isEmpty()) {
 //            result = customerRepository.findAll(pageable);
 //        } else {
