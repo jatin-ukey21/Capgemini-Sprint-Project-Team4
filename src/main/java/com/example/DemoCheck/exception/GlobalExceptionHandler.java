@@ -1,6 +1,7 @@
 package com.example.DemoCheck.exception;
 
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.validation.ConstraintViolationException;
 import org.springframework.core.convert.ConversionFailedException;
 import org.springframework.data.rest.webmvc.ResourceNotFoundException;
 import org.springframework.http.HttpStatus;
@@ -9,11 +10,12 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
 import java.time.LocalDateTime;
+import java.util.stream.Collectors;
 
 @RestControllerAdvice
 public class GlobalExceptionHandler {
 
-    //Invalid ID format (e.g., /customer/abc)
+    //Invalid ID format
     @ExceptionHandler(ConversionFailedException.class)
     public ResponseEntity<ErrorResponse> handleConversionFailed(
             ConversionFailedException ex,
@@ -26,7 +28,7 @@ public class GlobalExceptionHandler {
                 LocalDateTime.now()
         );
 
-        return new ResponseEntity<>(error, HttpStatus.BAD_REQUEST);
+         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(error);
     }
 
     //Customer not found (valid ID but not present)
@@ -42,7 +44,42 @@ public class GlobalExceptionHandler {
                 LocalDateTime.now()
         );
 
-        return new ResponseEntity<>(error, HttpStatus.NOT_FOUND);
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(error);
+    }
+
+    @ExceptionHandler(IllegalArgumentException.class)
+    public ResponseEntity<ErrorResponse> handleBadRequest(
+            IllegalArgumentException ex,
+            HttpServletRequest request) {
+
+        ErrorResponse error = new ErrorResponse(
+                400,
+                ex.getMessage(),
+                request.getRequestURI(),
+                LocalDateTime.now()
+        );
+
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(error);
+    }
+
+    @ExceptionHandler(ConstraintViolationException.class)
+    public ResponseEntity<ErrorResponse> handleConstraintViolation(
+            ConstraintViolationException ex,
+            HttpServletRequest request) {
+
+        String message = ex.getConstraintViolations()
+                .stream()
+                .map(v -> v.getPropertyPath() + ": " + v.getMessage())
+                .collect(Collectors.joining(", "));
+
+        ErrorResponse error = new ErrorResponse(
+                400,
+                message,
+                request.getRequestURI(),
+                LocalDateTime.now()
+        );
+
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(error);
     }
 
     //Generic fallback
@@ -58,6 +95,6 @@ public class GlobalExceptionHandler {
                 LocalDateTime.now()
         );
 
-        return new ResponseEntity<>(error, HttpStatus.INTERNAL_SERVER_ERROR);
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(error);
     }
 }

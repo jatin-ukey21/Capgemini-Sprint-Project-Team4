@@ -1,6 +1,7 @@
 package com.example.DemoCheck.entity;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -55,6 +56,6 @@ public class Customer {
     //Relationship with Employee (Many Customers → One Employee)
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "salesRepEmployeeNumber")
-    @JsonIgnore
+    @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
     private Employee salesRepEmployee;
 }
