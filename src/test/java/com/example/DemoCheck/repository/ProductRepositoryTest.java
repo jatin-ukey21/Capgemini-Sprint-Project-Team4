@@ -39,7 +39,7 @@ public class ProductRepositoryTest {
 
         p1.setProductCode("S10_89876");
         p1.setProductName("Parker pen");
-        p1.setProductLine("Planes");
+//        p1.setProductLine("productLines/Planes");
         p1.setProductVendor("Novelty");
         p1.setProductScale("1:10");
         p1.setProductDescription("Parker pen");
@@ -51,7 +51,7 @@ public class ProductRepositoryTest {
 
         p2.setProductCode("S10_89856");
         p2.setProductName("Trimax");
-        p2.setProductLine("Planes");
+//        p2.setProductLine("/products/Planes");
         p2.setProductVendor("Novelty");
         p2.setProductScale("1:10");
         p2.setProductDescription("Trimax pen");

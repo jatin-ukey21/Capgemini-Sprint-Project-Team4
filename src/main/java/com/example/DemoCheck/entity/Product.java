@@ -24,7 +24,7 @@ public class Product {
 
     @ManyToOne
     @JoinColumn(name = "productLine", referencedColumnName = "productLine")
-    private String productLine;
+    private ProductLine productLine;
 
     @Column(name = "productVendor")
     private String productVendor;

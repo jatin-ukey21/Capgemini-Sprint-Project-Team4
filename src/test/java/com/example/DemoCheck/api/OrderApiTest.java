@@ -186,4 +186,12 @@ void testSaveOrder() throws Exception {
 //                        .content(json))
 //                .andExpect(status().isBadRequest());
 //    }
+
+    // for pagination
+    @Test
+    void testPagination() throws Exception {
+
+        mockMvc.perform(get("/orders?page=0&size=5"))
+                .andExpect(status().isOk());
+    }
 }

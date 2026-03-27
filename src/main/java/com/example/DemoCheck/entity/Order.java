@@ -31,8 +31,5 @@ public class Order {
 
     @Column(name = "comments", columnDefinition = "TEXT")
     private String comments;
-
-
-
 }
 

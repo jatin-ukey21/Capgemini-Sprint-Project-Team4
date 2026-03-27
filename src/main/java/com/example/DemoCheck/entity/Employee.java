@@ -32,4 +32,6 @@ public class Employee {
 
     @Column(name = "jobTitle", length = 50)
     private String jobTitle;
+
+
 }
