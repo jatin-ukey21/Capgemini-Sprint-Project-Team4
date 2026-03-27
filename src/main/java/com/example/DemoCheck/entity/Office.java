@@ -30,10 +30,10 @@ public class Office {
     @Column(name = "addressLine1",nullable = false,length = 50)
     private String addressLine1;
 
-    @Column(name = "addressLine2",nullable = false,length = 50)
+    @Column(name = "addressLine2",length = 50)
     private String addressLine2;
 
-    @Column(name = "state",nullable = false,length = 50)
+    @Column(name = "state",length = 50)
     private String state;
 
     @Column(name = "country",nullable = false,length = 50)

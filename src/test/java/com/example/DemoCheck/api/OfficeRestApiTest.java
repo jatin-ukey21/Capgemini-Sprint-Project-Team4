@@ -212,6 +212,7 @@ class OfficeRestApiTest {
         assertEquals("6666666666",updated.getPhone());
         assertEquals("Updated Line 1",updated.getAddressLine1());
     }
+
     @Test
     void updateOffice_shouldCreateOffice_whenOfficeDoesNotExist() throws Exception {
         String body = """
@@ -234,6 +235,7 @@ class OfficeRestApiTest {
 
         assertTrue(officeRepository.existsById("T95"));
     }
+
 
     //projection_pagination
     @Test
@@ -270,5 +272,26 @@ class OfficeRestApiTest {
                 .andExpect(jsonPath("$.page.number").value(0))
                 .andExpect(jsonPath("$.page.totalElements").exists())
                 .andExpect(jsonPath("$.page.totalPages").exists());
+    }
+    @Test
+    void getAllOffices_shouldReturnEmptyPage_whenPageOutOfRange() throws Exception{
+        officeRepository.save(createOffice("P101", "London", "+44 20 7877 2041",
+                "25 Old Broad Street", "Level 7", null, "UK", "EC2N 1HN", "EMEA"));
+
+        officeRepository.save(createOffice("P102", "Tokyo", "+81 3 1234 5678",
+                "Marunouchi 1-1", "Floor 5", null, "Japan", "100-0005", "APAC"));
+
+        var request = get("/offices")
+                .param("projection","officeList")
+                .param("page","5")
+                .param("size","2");
+
+        var result = mockMvc.perform(request).andDo(print());
+
+        result.andExpect(status().isOk())
+                .andExpect(jsonPath("$._embedded.offices.length()").value(0))
+                .andExpect(jsonPath("$.page.size").value(2))
+                .andExpect(jsonPath("$.page.number").value(5));
+
     }
 }
