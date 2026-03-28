@@ -24,9 +24,6 @@ public class Employee {
     @Column(name = "email", nullable = false, length = 100)
     private String email;
 
-    @Column(name = "officeCode", nullable = false)
-    private String officeCode;
-
     @Column(name = "jobTitle", length = 50)
     private String jobTitle;
 
