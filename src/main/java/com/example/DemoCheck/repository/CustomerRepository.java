@@ -7,7 +7,6 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.data.rest.core.annotation.RepositoryRestResource;
-import org.springframework.data.rest.core.annotation.RestResource;
 
 @RepositoryRestResource(path = "customer")
 public interface CustomerRepository extends JpaRepository<Customer, Integer> {
@@ -19,9 +18,6 @@ public interface CustomerRepository extends JpaRepository<Customer, Integer> {
         LOWER(c.country) LIKE LOWER(CONCAT('%', :keyword, '%'))
     """)
     Page<Customer> findCustomers(@Param("keyword") String keyword, Pageable pageable);
-
-    @RestResource(path="by-employee", rel="by-employee")
-    Page<Customer> findBySalesRepEmployee_EmployeeNumber(@Param("employeeNumber") Integer employeeNumber, Pageable pageable);
 }
 
 
