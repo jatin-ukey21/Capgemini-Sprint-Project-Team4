@@ -751,7 +751,7 @@ class CustomerApiTest {
                         .content(json))
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.message")
-                        .value("phone must be exactly 10 digits"));
+                        .value("phone must contain 8 to 15 digits"));
 
         //Ensure DB not corrupted
         Customer unchanged = customerRepository.findById(id).orElseThrow();
@@ -858,7 +858,7 @@ class CustomerApiTest {
                         .content(json))
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.message")
-                        .value("phone must be exactly 10 digits"));
+                        .value("phone must contain 8 to 15 digits"));
 
         //VERY IMPORTANT: ensure DB unchanged
         Customer unchanged = customerRepository.findById(id).orElseThrow();
@@ -866,6 +866,25 @@ class CustomerApiTest {
         assertThat(unchanged.getPhone()).isEqualTo("1234567890");
     }
 
+    @Test
+    void shouldAcceptFormattedPhoneNumber() throws Exception {
+        int id = generateId();
+        customerRepository.save(createCustomer(id, "Phone Corp", "Mumbai"));
+
+        String json = """
+    {
+      "phone": "+91 98765 43210"
+    }
+    """;
+
+        mockMvc.perform(patch("/customer/update/" + id)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(json))
+                .andExpect(status().isOk());
+
+        Customer updated = customerRepository.findById(id).orElseThrow();
+        assertThat(updated.getPhone()).isEqualTo("919876543210"); // normalized
+    }
     @AfterEach
     void cleanup() {
 

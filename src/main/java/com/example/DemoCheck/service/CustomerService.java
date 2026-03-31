@@ -21,7 +21,7 @@ public class CustomerService {
         Customer customer = customerRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Customer not found"));
 
-        // --- APPLY PATCH ---
+        // --- NON-NULLABLE FIELDS ---
 
         if (dto.getCustomerName() != null) {
             validateNotBlank(dto.getCustomerName(), "customerName");
@@ -39,10 +39,13 @@ public class CustomerService {
         }
 
         if (dto.getPhone() != null) {
-            if (!dto.getPhone().matches("^[0-9]{10}$")) {
-                throw new IllegalArgumentException("phone must be exactly 10 digits");
+            String normalized = normalizePhone(dto.getPhone());
+
+            if (normalized.length() < 8 || normalized.length() > 15) {
+                throw new IllegalArgumentException("phone must contain 8 to 15 digits");
             }
-            customer.setPhone(dto.getPhone());
+
+            customer.setPhone(normalized);
         }
 
         if (dto.getAddressLine1() != null) {
@@ -50,18 +53,9 @@ public class CustomerService {
             customer.setAddressLine1(dto.getAddressLine1().trim());
         }
 
-        customer.setAddressLine2(dto.getAddressLine2());
-
         if (dto.getCity() != null) {
             validateNotBlank(dto.getCity(), "city");
             customer.setCity(dto.getCity().trim());
-        }
-
-        if (dto.getPostalCode() != null) {
-            if (!dto.getPostalCode().matches("^[0-9]{6}$")) {
-                throw new IllegalArgumentException("postalCode must be 6 digits");
-            }
-            customer.setPostalCode(dto.getPostalCode());
         }
 
         if (dto.getCountry() != null) {
@@ -69,20 +63,56 @@ public class CustomerService {
             customer.setCountry(dto.getCountry().trim());
         }
 
-        if (dto.getCreditLimit() != null) {
-            if (dto.getCreditLimit().signum() < 0) {
-                throw new IllegalArgumentException("creditLimit cannot be negative");
+        // --- NULLABLE FIELDS (PATCH CORRECT LOGIC) ---
+
+        if (dto.hasAddressLine2()) {
+            if (dto.getAddressLine2() == null) {
+                customer.setAddressLine2(null);
+            } else {
+                customer.setAddressLine2(dto.getAddressLine2().trim());
             }
-            customer.setCreditLimit(dto.getCreditLimit());
         }
 
-        if (dto.getSalesRepEmployeeNumber() != null) {
-            Employee emp = employeeRepository.findById(dto.getSalesRepEmployeeNumber())
-                    .orElseThrow(() -> new IllegalArgumentException("Invalid or non-existing employee reference"));
-            customer.setSalesRepEmployee(emp);
+        if (dto.hasPostalCode()) {
+            if (dto.getPostalCode() == null) {
+                customer.setPostalCode(null);
+            } else {
+                String postal = dto.getPostalCode().trim();
+
+                if (postal.length() < 3 || postal.length() > 10) {
+                    throw new IllegalArgumentException("postalCode must be between 3 and 10 characters");
+                }
+
+                customer.setPostalCode(postal);
+            }
+        }
+
+        if (dto.hasCreditLimit()) {
+            if (dto.getCreditLimit() == null) {
+                customer.setCreditLimit(null);
+            } else {
+                if (dto.getCreditLimit().signum() < 0) {
+                    throw new IllegalArgumentException("creditLimit cannot be negative");
+                }
+                customer.setCreditLimit(dto.getCreditLimit());
+            }
+        }
+
+        if (dto.hasSalesRepEmployeeNumber()) {
+            if (dto.getSalesRepEmployeeNumber() == null) {
+                customer.setSalesRepEmployee(null);
+            } else {
+                Employee emp = employeeRepository.findById(dto.getSalesRepEmployeeNumber())
+                        .orElseThrow(() -> new IllegalArgumentException("Invalid or non-existing employee reference"));
+                customer.setSalesRepEmployee(emp);
+            }
         }
 
         return customerRepository.save(customer);
+    }
+
+    private String normalizePhone(String phone) {
+        return phone.replaceAll("[^\\d]", "");
     }
 
     private void validateNotBlank(String value, String field) {
