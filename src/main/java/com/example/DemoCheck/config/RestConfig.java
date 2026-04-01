@@ -43,6 +43,12 @@ public class RestConfig implements RepositoryRestConfigurer {
                         .addProjection(com.example.DemoCheck.projection.CustomerListProjection.class);
 
                 config.getProjectionConfiguration()
+                        .addProjection(com.example.DemoCheck.projection.CustomerEditProjection.class);
+
+                config.getProjectionConfiguration()
+                        .addProjection(com.example.DemoCheck.projection.OrderListProjection.class);
+
+                config.getProjectionConfiguration()
                         .addProjection(com.example.DemoCheck.projection.PaymentProjection.class);
 
                 // MY CHANGES
@@ -52,6 +58,7 @@ public class RestConfig implements RepositoryRestConfigurer {
         //EXPOSE ID to be be included in the response
         config.exposeIdsFor(com.example.DemoCheck.entity.Office.class);
 
+        config.exposeIdsFor(com.example.DemoCheck.entity.Customer.class);
         config.getProjectionConfiguration()
                 .addProjection(com.example.DemoCheck.projection.EmployeeProjection.class);
 
